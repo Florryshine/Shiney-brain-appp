@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shiney Brain JAMB Mock CBT</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 text-slate-800">
+  <div id="app" class="min-h-screen">
+    <section id="home-screen" class="min-h-screen flex items-center justify-center px-4 py-8">
+      <div class="w-full max-w-xl">
+        <div class="bg-white rounded-3xl shadow-xl border border-slate-200 p-8 text-center">
+          <div class="w-20 h-20 mx-auto rounded-3xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-3xl font-black mb-5">
+            SB
+          </div>
+          <p class="text-sm font-bold uppercase tracking-[0.25em] text-emerald-700 mb-2">JAMB Computer-Based Test</p>
+          <h1 class="text-3xl sm:text-4xl font-black leading-tight mb-4">Shiney Brain JAMB Mock CBT</h1>
+          <p class="text-slate-600 leading-7 mb-8">
+            Practice in Single Subject Mode or full Mock Mode with timed questions, instant scoring, and a clean JAMB-style CBT experience.
+          </p>
+          <button id="start-home-btn" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-lg shadow-lg shadow-emerald-200 transition">
+            Start Exam
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section id="selection-screen" class="hidden min-h-screen px-4 py-6">
+      <div class="max-w-6xl mx-auto">
+        <div class="flex items-center justify-between gap-3 mb-6">
+          <div>
+            <p class="text-sm font-bold uppercase tracking-[0.25em] text-emerald-700">Setup Exam</p>
+            <h2 class="text-2xl sm:text-3xl font-black">Choose Mode & Subjects</h2>
+          </div>
+          <button id="back-home-btn" class="px-4 py-3 rounded-xl bg-white border border-slate-200 font-bold hover:bg-slate-50">Home</button>
+        </div>
+
+        <div class="grid gap-4 lg:grid-cols-[1fr_2fr]">
+          <div class="space-y-4">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+              <h3 class="text-lg font-extrabold mb-4">Exam Mode</h3>
+              <div class="grid gap-3">
+                <button class="mode-btn rounded-2xl border-2 border-slate-200 px-4 py-4 text-left transition" data-mode="single">
+                  <span class="block text-base font-extrabold">OPTION A: Single Subject Mode</span>
+                  <span class="block text-sm text-slate-600 mt-1">40 questions • 30 minutes • Select 1 subject</span>
+                </button>
+                <button class="mode-btn rounded-2xl border-2 border-slate-200 px-4 py-4 text-left transition" data-mode="mock">
+                  <span class="block text-base font-extrabold">OPTION B: Mock Mode</span>
+                  <span class="block text-sm text-slate-600 mt-1">160 questions • 120 minutes • Select exactly 4 subjects</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+              <h3 class="text-lg font-extrabold mb-3">Exam Rules</h3>
+              <div id="mode-rules" class="text-sm text-slate-700 leading-7">
+                Choose a mode to view its rules.
+              </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5">
+              <h3 class="text-lg font-extrabold mb-3">Selection Status</h3>
+              <p id="selection-status" class="font-semibold text-slate-700">No mode selected yet.</p>
+              <p id="selection-hint" class="text-sm text-slate-500 mt-2">Select a mode, then choose your subject(s).</p>
+              <button id="start-selected-exam-btn" class="w-full mt-5 px-6 py-4 rounded-2xl bg-slate-300 text-white font-extrabold text-lg cursor-not-allowed" disabled>
+                Start Selected Exam
+              </button>
+            </div>
+          </div>
+
+          <div id="subject-groups" class="space-y-4"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="exam-screen" class="hidden min-h-screen">
+      <div class="sticky top-0 z-20 bg-white/95 backdrop-blur border-b border-slate-200 shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-4">
+          <div class="flex items-center justify-between gap-4">
+            <div>
+              <p id="exam-mode-label" class="text-xs sm:text-sm font-bold uppercase tracking-[0.2em] text-emerald-700"></p>
+              <h2 class="text-lg sm:text-2xl font-black">Shiney Brain JAMB Mock CBT</h2>
+            </div>
+            <div class="text-right shrink-0">
+              <p class="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">Time Left</p>
+              <p id="timer-display" class="text-2xl sm:text-3xl font-black text-rose-600">00:00</p>
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <div class="h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div id="progress-bar" class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width:0%"></div>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs sm:text-sm font-bold text-slate-600">
+              <span id="progress-text">Question 1 of 1</span>
+              <span id="answered-count">Answered: 0</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-6xl mx-auto px-4 py-6">
+        <div class="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
+          <div class="space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5 sm:p-6">
+              <div class="flex items-center justify-between gap-3 mb-4">
+                <span id="question-subject-badge" class="inline-flex items-center rounded-full bg-emerald-100 text-emerald-700 px-3 py-1 text-sm font-bold"></span>
+                <span id="question-number-badge" class="inline-flex items-center rounded-full bg-slate-100 text-slate-700 px-3 py-1 text-sm font-bold"></span>
+              </div>
+
+              <h3 id="question-text" class="text-lg sm:text-xl font-bold leading-8 mb-5"></h3>
+              <div id="options-container" class="space-y-3"></div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-4">
+              <div class="flex items-center justify-between gap-3">
+                <button id="prev-btn" class="px-5 py-3 rounded-xl bg-slate-200 hover:bg-slate-300 disabled:opacity-50 disabled:cursor-not-allowed font-bold">
+                  ← Previous
+                </button>
+                <button id="submit-exam-btn" class="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold">
+                  Submit Exam
+                </button>
+                <button id="next-btn" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold">
+                  Next →
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+              <h3 class="text-lg font-extrabold mb-3">Question Navigator</h3>
+              <p class="text-sm text-slate-600 mb-4">Tap a number to jump to any question.</p>
+              <div id="question-nav" class="grid grid-cols-5 sm:grid-cols-8 lg:grid-cols-5 xl:grid-cols-8 gap-2 max-h-[420px] overflow-auto pr-1"></div>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-5">
+              <h3 class="text-lg font-extrabold mb-3">Legend</h3>
+              <div class="space-y-2 text-sm">
+                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded bg-emerald-600"></span><span>Current question</span></div>
+                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded bg-sky-500"></span><span>Answered question</span></div>
+                <div class="flex items-center gap-2"><span class="w-5 h-5 rounded bg-slate-200 border border-slate-300"></span><span>Unanswered question</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="result-screen" class="hidden min-h-screen px-4 py-6">
+      <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-3xl border border-slate-200 shadow-xl overflow-hidden">
+          <div class="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white p-6 sm:p-8">
+            <p class="text-sm font-bold uppercase tracking-[0.25em] opacity-90">Exam Completed</p>
+            <h2 class="text-3xl sm:text-4xl font-black mt-2">Your Result</h2>
+          </div>
+
+          <div class="p-6 sm:p-8 space-y-6">
+            <div class="grid gap-4 sm:grid-cols-3">
+              <div class="rounded-2xl bg-slate-50 border border-slate-200 p-5 text-center">
+                <p class="text-sm font-semibold text-slate-500">Score</p>
+                <p id="result-score" class="text-3xl font-black">0</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 border border-slate-200 p-5 text-center">
+                <p class="text-sm font-semibold text-slate-500">Total Questions</p>
+                <p id="result-total" class="text-3xl font-black">0</p>
+              </div>
+              <div class="rounded-2xl bg-slate-50 border border-slate-200 p-5 text-center">
+                <p class="text-sm font-semibold text-slate-500">Percentage</p>
+                <p id="result-percentage" class="text-3xl font-black">0%</p>
+              </div>
+            </div>
+
+            <div id="result-message-box" class="rounded-2xl border p-5 text-center">
+              <p id="result-message" class="text-xl font-black"></p>
+              <p id="result-subtext" class="text-sm text-slate-600 mt-2"></p>
+            </div>
+
+            <div class="rounded-2xl bg-slate-50 border border-slate-200 p-5">
+              <h3 class="text-lg font-extrabold mb-4">Subject Breakdown</h3>
+              <div id="subject-breakdown" class="grid gap-3 sm:grid-cols-2"></div>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3">
+              <button id="retake-btn" class="flex-1 px-6 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold">Retake</button>
+              <button id="go-home-result-btn" class="flex-1 px-6 py-4 rounded-2xl bg-slate-200 hover:bg-slate-300 text-slate-900 font-extrabold">Back Home</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const SUBJECT_GROUPS = {
+      SCIENCE: ["Biology", "Chemistry", "Physics", "Mathematics"],
+      ARTS: ["English Language", "Literature in English", "Government", "CRS", "IRS", "History", "Fine Art"],
+      COMMERCIAL: ["Economics", "Commerce", "Accounting", "Marketing", "Geography", "Civic Education"]
+    };
+
+    const SUBJECT_SEEDS = {
+      "Biology": [
+        { prompt: "The basic unit of life is:", correct: "Cell", distractors: ["Tissue", "Organ", "Atom"] },
+        { prompt: "The green pigment in plants is:", correct: "Chlorophyll", distractors: ["Haemoglobin", "Melanin", "Keratin"] },
+        { prompt: "Plants make food through:", correct: "Photosynthesis", distractors: ["Respiration", "Transpiration", "Fermentation"] },
+        { prompt: "Mammals breathe mainly with:", correct: "Lungs", distractors: ["Gills", "Tracheae", "Skin only"] },
+        { prompt: "The transfer of pollen to a stigma is called:", correct: "Pollination", distractors: ["Fertilization", "Germination", "Budding"] },
+        { prompt: "The liquid part of blood is:", correct: "Plasma", distractors: ["Red blood cell", "White blood cell", "Platelet"] },
+        { prompt: "A unit of heredity is a:", correct: "Gene", distractors: ["Nucleus", "Enzyme", "Chloroplast"] },
+        { prompt: "An organism that makes its own food is an:", correct: "Autotroph", distractors: ["Parasite", "Saprophyte", "Predator"] }
+      ],
+      "Chemistry": [
+        { prompt: "A substance with pH less than 7 is:", correct: "Acidic", distractors: ["Neutral", "Basic", "Salty"] },
+        { prompt: "The chemical formula of water is:", correct: "H2O", distractors: ["CO2", "O2", "NaCl"] },
+        { prompt: "Common salt is:", correct: "Sodium chloride", distractors: ["Potassium nitrate", "Calcium carbonate", "Magnesium sulphate"] },
+        { prompt: "Burning in oxygen is called:", correct: "Combustion", distractors: ["Condensation", "Evaporation", "Filtration"] },
+        { prompt: "The gas commonly used in balloons is:", correct: "Helium", distractors: ["Nitrogen", "Oxygen", "Chlorine"] },
+        { prompt: "The atomic number of oxygen is:", correct: "8", distractors: ["6", "10", "16"] },
+        { prompt: "A substance that speeds up a reaction without being used up is a:", correct: "Catalyst", distractors: ["Solvent", "Product", "Residue"] },
+        { prompt: "The smallest particle of an element is an:", correct: "Atom", distractors: ["Ion", "Mixture", "Solution"] }
+      ],
+      "Physics": [
+        { prompt: "The SI unit of force is:", correct: "Newton", distractors: ["Joule", "Watt", "Pascal"] },
+        { prompt: "An instrument used to measure electric current is an:", correct: "Ammeter", distractors: ["Voltmeter", "Barometer", "Thermometer"] },
+        { prompt: "Distance divided by time gives:", correct: "Speed", distractors: ["Acceleration", "Velocity", "Momentum"] },
+        { prompt: "The force that pulls objects toward the earth is:", correct: "Gravity", distractors: ["Magnetism", "Friction", "Tension"] },
+        { prompt: "The SI unit of power is:", correct: "Watt", distractors: ["Joule", "Newton", "Volt"] },
+        { prompt: "The SI unit of resistance is:", correct: "Ohm", distractors: ["Ampere", "Coulomb", "Weber"] },
+        { prompt: "A device that converts electrical energy to mechanical energy is an:", correct: "Electric motor", distractors: ["Generator", "Transformer", "Battery"] },
+        { prompt: "Light travels fastest in:", correct: "Vacuum", distractors: ["Water", "Glass", "Air saturated with dust"] }
+      ],
+      "Mathematics": [
+        { prompt: "The sum of the interior angles of a triangle is:", correct: "180°", distractors: ["90°", "270°", "360°"] },
+        { prompt: "The approximate value of pi is:", correct: "3.14", distractors: ["2.14", "4.13", "3.41"] },
+        { prompt: "The square root of 81 is:", correct: "9", distractors: ["8", "7", "6"] },
+        { prompt: "If 2x = 10, then x =", correct: "5", distractors: ["2", "10", "20"] },
+        { prompt: "The perimeter of a rectangle is:", correct: "2(l + b)", distractors: ["l × b", "l + b", "l² + b²"] },
+        { prompt: "25% written as a fraction is:", correct: "1/4", distractors: ["1/2", "1/5", "3/4"] },
+        { prompt: "The middle value in an ordered data set is the:", correct: "Median", distractors: ["Mode", "Mean", "Range"] },
+        { prompt: "Lines that never meet are called:", correct: "Parallel lines", distractors: ["Perpendicular lines", "Intersecting lines", "Curved lines"] }
+      ],
+      "English Language": [
+        { prompt: "A word that describes a verb is an:", correct: "Adverb", distractors: ["Adjective", "Pronoun", "Conjunction"] },
+        { prompt: "A word nearest in meaning to 'brave' is:", correct: "Courageous", distractors: ["Timid", "Weak", "Careless"] },
+        { prompt: "The punctuation mark used after a direct question is a:", correct: "Question mark", distractors: ["Comma", "Colon", "Full stop"] },
+        { prompt: "A word nearest in meaning to 'happy' is:", correct: "Joyful", distractors: ["Bitter", "Angry", "Lazy"] },
+        { prompt: "A noun is used to name a:", correct: "Person, place, animal or thing", distractors: ["Action word", "Describing word", "Joining word"] },
+        { prompt: "A word opposite in meaning to 'scarce' is:", correct: "Abundant", distractors: ["Rare", "Few", "Little"] },
+        { prompt: "A group of words with a subject and a verb is a:", correct: "Clause", distractors: ["Phrase", "Syllable", "Letter"] },
+        { prompt: "A word used in place of a noun is a:", correct: "Pronoun", distractors: ["Preposition", "Interjection", "Article"] }
+      ],
+      "Literature in English": [
+        { prompt: "A figure of speech that compares two things using 'like' or 'as' is:", correct: "Simile", distractors: ["Metaphor", "Irony", "Hyperbole"] },
+        { prompt: "The central message of a literary work is the:", correct: "Theme", distractors: ["Plot", "Setting", "Tone"] },
+        { prompt: "The main character in a story is the:", correct: "Protagonist", distractors: ["Antagonist", "Narrator", "Editor"] },
+        { prompt: "A poem of mourning or sorrow is an:", correct: "Elegy", distractors: ["Ode", "Ballad", "Sonnet"] },
+        { prompt: "The repetition of initial consonant sounds is:", correct: "Alliteration", distractors: ["Assonance", "Paradox", "Satire"] },
+        { prompt: "The literary opposite of tragedy is:", correct: "Comedy", distractors: ["Epic", "Prose", "Lyric"] },
+        { prompt: "A long narrative poem is an:", correct: "Epic", distractors: ["Drama", "Elegy", "Farce"] },
+        { prompt: "A conversation between characters in a play is:", correct: "Dialogue", distractors: ["Stanza", "Chapter", "Aside note"] }
+      ],
+      "Government": [
+        { prompt: "A system of government in which people rule through elected representatives is:", correct: "Democracy", distractors: ["Monarchy", "Oligarchy", "Dictatorship"] },
+        { prompt: "The arm of government that interprets laws is the:", correct: "Judiciary", distractors: ["Executive", "Legislature", "Civil service"] },
+        { prompt: "The organ of government that makes laws is the:", correct: "Legislature", distractors: ["Judiciary", "Executive", "Electorate"] },
+        { prompt: "The head of a local government area in Nigeria is commonly called the:", correct: "Chairman", distractors: ["Governor", "President", "Speaker"] },
+        { prompt: "Rights guaranteed by the constitution are called:", correct: "Fundamental rights", distractors: ["Directive principles", "Cabinet powers", "Military decrees"] },
+        { prompt: "The division of government powers among organs is called:", correct: "Separation of powers", distractors: ["Federal character", "Rule of law", "Delegated legislation"] },
+        { prompt: "Voting in private so others cannot see your choice is called:", correct: "Secret ballot", distractors: ["Open ballot", "Voice vote", "Referendum"] },
+        { prompt: "Rule by force under one strong leader is best described as:", correct: "Dictatorship", distractors: ["Confederation", "Democracy", "Federalism"] }
+      ],
+      "CRS": [
+        { prompt: "Jesus was born in:", correct: "Bethlehem", distractors: ["Nazareth", "Jerusalem", "Galilee"] },
+        { prompt: "The first book in the New Testament is:", correct: "Matthew", distractors: ["Genesis", "Acts", "Romans"] },
+        { prompt: "Jesus was baptized in River:", correct: "Jordan", distractors: ["Nile", "Euphrates", "Tigris"] },
+        { prompt: "The disciple who denied Jesus three times was:", correct: "Peter", distractors: ["John", "James", "Andrew"] },
+        { prompt: "Noah built an:", correct: "Ark", distractors: ["Altar", "Temple", "Tower"] },
+        { prompt: "At Cana, Jesus turned water into:", correct: "Wine", distractors: ["Oil", "Milk", "Blood"] },
+        { prompt: "David defeated:", correct: "Goliath", distractors: ["Saul", "Samson", "Absalom"] },
+        { prompt: "The Christian celebration of the resurrection of Jesus is:", correct: "Easter", distractors: ["Christmas", "Pentecost", "Harvest"] }
+      ],
+      "IRS": [
+        { prompt: "The holy book of Islam is the:", correct: "Qur'an", distractors: ["Torah", "Bible", "Vedas"] },
+        { prompt: "The direction Muslims face during prayer is the:", correct: "Qiblah", distractors: ["Kaftan", "Minbar", "Sunnah"] },
+        { prompt: "The pilgrimage to Makkah is called:", correct: "Hajj", distractors: ["Sawm", "Zakat", "Shahadah"] },
+        { prompt: "The first prophet in Islam is:", correct: "Adam", distractors: ["Musa", "Isa", "Nuh"] },
+        { prompt: "The month of compulsory fasting in Islam is:", correct: "Ramadan", distractors: ["Muharram", "Safar", "Rajab"] },
+        { prompt: "The angel who delivered revelation to Prophet Muhammad was:", correct: "Jibril", distractors: ["Mikail", "Israfil", "Azrail"] },
+        { prompt: "The compulsory charity in Islam is called:", correct: "Zakat", distractors: ["Hajj", "Salah", "Tahajjud"] },
+        { prompt: "The Islamic greeting meaning peace be upon you is:", correct: "Assalamu alaikum", distractors: ["Allahu Akbar", "Subhanallah", "Bismillah"] }
+      ],
+      "History": [
+        { prompt: "The forced movement of Africans across the Atlantic for labour is the:", correct: "Slave trade", distractors: ["Triangular diplomacy", "Cold war", "Industrial revolution"] },
+        { prompt: "A notable Nigerian nationalist leader was:", correct: "Nnamdi Azikiwe", distractors: ["Mungo Park", "Lord Lugard", "Herbert Macaulay II"] },
+        { prompt: "Ancient Egyptian writing is known as:", correct: "Hieroglyphics", distractors: ["Cuneiform", "Latin", "Arabic"] },
+        { prompt: "The amalgamation of Northern and Southern Nigeria took place in:", correct: "1914", distractors: ["1960", "1900", "1999"] },
+        { prompt: "The First World War began in:", correct: "1914", distractors: ["1939", "1905", "1963"] },
+        { prompt: "Nigeria gained independence in:", correct: "1960", distractors: ["1957", "1963", "1979"] },
+        { prompt: "The old Benin Kingdom became famous for its:", correct: "Bronze works", distractors: ["Silk weaving", "Paper making", "Ship building"] },
+        { prompt: "Colonial rule means control of one country by a:", correct: "Foreign power", distractors: ["Local council", "Religious body", "Trade union"] }
+      ],
+      "Fine Art": [
+        { prompt: "Mixing red and blue gives:", correct: "Purple", distractors: ["Orange", "Green", "Brown"] },
+        { prompt: "An artist who specializes in portraits is a:", correct: "Portraitist", distractors: ["Ceramist", "Muralist", "Weaver"] },
+        { prompt: "The art of beautiful handwriting is called:", correct: "Calligraphy", distractors: ["Casting", "Weaving", "Printmaking"] },
+        { prompt: "A sculpture made by cutting stone is a:", correct: "Carved sculpture", distractors: ["Woven sculpture", "Painted sculpture", "Printed sculpture"] },
+        { prompt: "Colours directly opposite each other on the colour wheel are:", correct: "Complementary colours", distractors: ["Warm colours", "Cool colours", "Neutral colours"] },
+        { prompt: "The correct relation of body parts in drawing is called:", correct: "Proportion", distractors: ["Texture", "Balance", "Harmony"] },
+        { prompt: "A common tool for applying water colour is a:", correct: "Brush", distractors: ["Chisel", "Compass", "Needle"] },
+        { prompt: "A repeated decorative arrangement is called a:", correct: "Pattern", distractors: ["Tone", "Hue", "Frame"] }
+      ],
+      "Economics": [
+        { prompt: "The study of how scarce resources are managed is:", correct: "Economics", distractors: ["Accounting", "Commerce", "Marketing"] },
+        { prompt: "Money set aside from income for future use is:", correct: "Savings", distractors: ["Rent", "Wages", "Tax"] },
+        { prompt: "A persistent rise in the general price level is:", correct: "Inflation", distractors: ["Deflation", "Depreciation", "Subsidy"] },
+        { prompt: "A want backed by ability and willingness to pay is:", correct: "Demand", distractors: ["Supply", "Choice", "Scarcity"] },
+        { prompt: "The reward for labour is:", correct: "Wages", distractors: ["Rent", "Interest", "Profit"] },
+        { prompt: "A market structure with only one seller is:", correct: "Monopoly", distractors: ["Perfect competition", "Oligopoly", "Monopsony"] },
+        { prompt: "Goods used to produce other goods are:", correct: "Capital goods", distractors: ["Consumer goods", "Free goods", "Inferior goods"] },
+        { prompt: "When government expenditure exceeds revenue, it is a:", correct: "Budget deficit", distractors: ["Budget surplus", "Fiscal union", "Price ceiling"] }
+      ],
+      "Commerce": [
+        { prompt: "The buying and selling of goods and services is:", correct: "Trade", distractors: ["Banking", "Insurance", "Production"] },
+        { prompt: "A document showing details of goods sold is an:", correct: "Invoice", distractors: ["Cheque", "Receipt", "Voucher"] },
+        { prompt: "Movement of goods by sea is:", correct: "Water transport", distractors: ["Air transport", "Road transport", "Pipeline transport"] },
+        { prompt: "A retailer mainly sells to:", correct: "Final consumers", distractors: ["Manufacturers", "Wholesalers", "Importers only"] },
+        { prompt: "Warehousing means:", correct: "Storage of goods", distractors: ["Advertising of goods", "Production of goods", "Inspection of goods only"] },
+        { prompt: "A wholesaler mainly buys from producers and sells to:", correct: "Retailers", distractors: ["Consumers", "Bankers", "Insurers"] },
+        { prompt: "Insurance is a business method of:", correct: "Sharing risk", distractors: ["Increasing tax", "Reducing transport", "Making laws"] },
+        { prompt: "Advertising is used to:", correct: "Promote goods and services", distractors: ["Store goods", "Produce raw materials", "Audit accounts"] }
+      ],
+      "Accounting": [
+        { prompt: "Assets minus liabilities equals:", correct: "Capital", distractors: ["Expense", "Turnover", "Discount"] },
+        { prompt: "The principal book that contains all accounts is the:", correct: "Ledger", distractors: ["Journal", "Invoice", "Memorandum"] },
+        { prompt: "A source document issued for cash received is a:", correct: "Receipt", distractors: ["Debit note", "Invoice", "Statement"] },
+        { prompt: "An entry on the left side of an account is a:", correct: "Debit", distractors: ["Credit", "Balance", "Contra"] },
+        { prompt: "The statement showing assets and liabilities is the:", correct: "Balance sheet", distractors: ["Trial balance", "Income statement", "Cash book"] },
+        { prompt: "The reduction in the value of a fixed asset over time is:", correct: "Depreciation", distractors: ["Appreciation", "Accumulation", "Provision"] },
+        { prompt: "The book of original entry is the:", correct: "Journal", distractors: ["Ledger", "Cash book", "Stock book"] },
+        { prompt: "An amount owed by a business is a:", correct: "Liability", distractors: ["Asset", "Capital", "Revenue"] }
+      ],
+      "Marketing": [
+        { prompt: "Marketing starts with identifying:", correct: "Consumer needs", distractors: ["Warehouse space", "Tax rates", "Factory colours"] },
+        { prompt: "The first stage of the product life cycle is:", correct: "Introduction", distractors: ["Decline", "Maturity", "Saturation"] },
+        { prompt: "A brand name helps product:", correct: "Identification", distractors: ["Destruction", "Taxation", "Importation"] },
+        { prompt: "Place in the 4Ps mainly refers to:", correct: "Distribution", distractors: ["Colour", "Packaging alone", "Profit"] },
+        { prompt: "Market research is used to gather:", correct: "Information", distractors: ["Electricity", "Furniture", "Insurance claims"] },
+        { prompt: "Promotion includes:", correct: "Advertising", distractors: ["Bookkeeping", "Warehousing", "Mining"] },
+        { prompt: "A temporary price reduction to attract buyers is a:", correct: "Discount", distractors: ["Tariff", "Dividend", "Lease"] },
+        { prompt: "A target market is a:", correct: "Specific group of customers", distractors: ["Government agency", "Shipping company", "Warehouse section"] }
+      ],
+      "Geography": [
+        { prompt: "The layer of gases surrounding the earth is the:", correct: "Atmosphere", distractors: ["Hydrosphere", "Lithosphere", "Biosphere"] },
+        { prompt: "The instrument used to measure rainfall is a:", correct: "Rain gauge", distractors: ["Wind vane", "Barometer", "Thermometer"] },
+        { prompt: "The imaginary line around the middle of the earth is the:", correct: "Equator", distractors: ["Prime Meridian", "Tropic of Cancer", "Horizon"] },
+        { prompt: "A model representation of the earth is a:", correct: "Globe", distractors: ["Map key", "Scale", "Atlas legend"] },
+        { prompt: "The wearing away of the earth surface is called:", correct: "Erosion", distractors: ["Condensation", "Evaporation", "Sedimentation only"] },
+        { prompt: "The natural home of an organism is its:", correct: "Habitat", distractors: ["Altitude", "Weather", "Climate zone"] },
+        { prompt: "Lines joining places of equal rainfall on a map are called:", correct: "Isohyets", distractors: ["Contours", "Isobars", "Latitudes"] },
+        { prompt: "A river enters the sea through its:", correct: "Mouth", distractors: ["Source", "Valley", "Tributary"] }
+      ],
+      "Civic Education": [
+        { prompt: "The willingness to defend one's country is:", correct: "Patriotism", distractors: ["Nepotism", "Tribalism", "Vandalism"] },
+        { prompt: "The supreme law of a country is the:", correct: "Constitution", distractors: ["Decree", "Manifesto", "Gazette"] },
+        { prompt: "The right to express opinions freely is:", correct: "Freedom of expression", distractors: ["Right to property", "Right to vote", "Right to movement only"] },
+        { prompt: "A good citizen should obey:", correct: "Lawful authority", distractors: ["Rumours", "Only friends", "Private gossip"] },
+        { prompt: "Values that promote peace and order include:", correct: "Tolerance", distractors: ["Violence", "Corruption", "Intimidation"] },
+        { prompt: "Human trafficking violates:", correct: "Human rights", distractors: ["Tax laws only", "Census rules", "Weather laws"] },
+        { prompt: "The act of voting during elections is a:", correct: "Civic responsibility", distractors: ["Commercial duty", "Religious festival", "Private luxury"] },
+        { prompt: "The misuse of public office for private gain is:", correct: "Corruption", distractors: ["Federalism", "Justice", "Tolerance"] }
+      ]
+    };
+
+    const QUESTION_VARIANTS = [
+      "",
+      "Choose the correct answer. ",
+      "Select the best option. ",
+      "Identify the correct response. ",
+      "For this question, choose the right answer. "
+    ];
+
+    const appState = {
+      mode: null,
+      selectedSubjects: [],
+      examQuestions: [],
+      answers: {},
+      currentIndex: 0,
+      timeRemaining: 0,
+      timerId: null,
+      submitted: false
+    };
+
+    const screens = {
+      home: document.getElementById('home-screen'),
+      selection: document.getElementById('selection-screen'),
+      exam: document.getElementById('exam-screen'),
+      result: document.getElementById('result-screen')
+    };
+
+    const elements = {
+      modeRules: document.getElementById('mode-rules'),
+      selectionStatus: document.getElementById('selection-status'),
+      selectionHint: document.getElementById('selection-hint'),
+      startSelectedExamBtn: document.getElementById('start-selected-exam-btn'),
+      subjectGroups: document.getElementById('subject-groups'),
+      examModeLabel: document.getElementById('exam-mode-label'),
+      timerDisplay: document.getElementById('timer-display'),
+      progressBar: document.getElementById('progress-bar'),
+      progressText: document.getElementById('progress-text'),
+      answeredCount: document.getElementById('answered-count'),
+      questionSubjectBadge: document.getElementById('question-subject-badge'),
+      questionNumberBadge: document.getElementById('question-number-badge'),
+      questionText: document.getElementById('question-text'),
+      optionsContainer: document.getElementById('options-container'),
+      questionNav: document.getElementById('question-nav'),
+      prevBtn: document.getElementById('prev-btn'),
+      nextBtn: document.getElementById('next-btn'),
+      resultScore: document.getElementById('result-score'),
+      resultTotal: document.getElementById('result-total'),
+      resultPercentage: document.getElementById('result-percentage'),
+      resultMessageBox: document.getElementById('result-message-box'),
+      resultMessage: document.getElementById('result-message'),
+      resultSubtext: document.getElementById('result-subtext'),
+      subjectBreakdown: document.getElementById('subject-breakdown')
+    };
+
+    function showScreen(name) {
+      Object.values(screens).forEach(screen => screen.classList.add('hidden'));
+      screens[name].classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function shuffle(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function buildQuestionBank() {
+      const bank = [];
+      Object.entries(SUBJECT_SEEDS).forEach(([subject, seeds]) => {
+        let count = 0;
+        QUESTION_VARIANTS.forEach((variant, variantIndex) => {
+          seeds.forEach((seed, seedIndex) => {
+            const options = shuffle([seed.correct, ...seed.distractors]);
+            const optionMap = {
+              A: options[0],
+              B: options[1],
+              C: options[2],
+              D: options[3]
+            };
+            const correctAnswer = Object.keys(optionMap).find(key => optionMap[key] === seed.correct);
+            bank.push({
+              id: `${subject}-${variantIndex + 1}-${seedIndex + 1}`,
+              subject,
+              question: `${variant}${seed.prompt}`.trim(),
+              options: optionMap,
+              correctAnswer
+            });
+            count++;
+          });
+        });
+
+        if (count !== 40) {
+          console.warn(`${subject} generated ${count} questions instead of 40.`);
+        }
+      });
+      return bank;
+    }
+
+    const QUESTION_BANK = buildQuestionBank();
+
+    function renderSubjectGroups() {
+      elements.subjectGroups.innerHTML = '';
+      Object.entries(SUBJECT_GROUPS).forEach(([group, subjects]) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bg-white rounded-2xl shadow-sm border border-slate-200 p-5';
+
+        const heading = document.createElement('h3');
+        heading.className = 'text-lg font-extrabold mb-4';
+        heading.textContent = group;
+        wrapper.appendChild(heading);
+
+        const grid = document.createElement('div');
+        grid.className = 'grid gap-3 sm:grid-cols-2 xl:grid-cols-3';
+
+        subjects.forEach(subject => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.dataset.subject = subject;
+          button.className = 'subject-btn text-left px-4 py-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-400 bg-slate-50 hover:bg-emerald-50 transition font-bold';
+          button.innerHTML = `<span class="block text-base">${subject}</span><span class="block text-xs text-slate-500 mt-1">Tap to select</span>`;
+          button.addEventListener('click', () => toggleSubject(subject));
+          grid.appendChild(button);
+        });
+
+        wrapper.appendChild(grid);
+        elements.subjectGroups.appendChild(wrapper);
+      });
+    }
+
+    function setMode(mode) {
+      appState.mode = mode;
+      appState.selectedSubjects = [];
+
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        const active = btn.dataset.mode === mode;
+        btn.className = active
+          ? 'mode-btn rounded-2xl border-2 border-emerald-600 bg-emerald-50 px-4 py-4 text-left transition'
+          : 'mode-btn rounded-2xl border-2 border-slate-200 px-4 py-4 text-left transition';
+      });
+
+      if (mode === 'single') {
+        elements.modeRules.innerHTML = `
+          <p><strong>Single Subject Mode</strong></p>
+          <p>• You must select exactly <strong>1 subject</strong>.</p>
+          <p>• You will answer <strong>40 questions</strong>.</p>
+          <p>• Time allowed: <strong>30 minutes</strong>.</p>
+          <p>• Exam submits automatically when time runs out.</p>
+        `;
+      } else {
+        elements.modeRules.innerHTML = `
+          <p><strong>Mock Mode</strong></p>
+          <p>• You must select exactly <strong>4 subjects</strong>.</p>
+          <p>• You will answer <strong>160 questions</strong> total.</p>
+          <p>• Each subject contributes <strong>40 questions</strong>.</p>
+          <p>• Time allowed: <strong>120 minutes</strong>.</p>
+        `;
+      }
+
+      updateSelectionUI();
+    }
+
+    function toggleSubject(subject) {
+      if (!appState.mode) return;
+
+      const selected = appState.selectedSubjects.includes(subject);
+
+      if (appState.mode === 'single') {
+        appState.selectedSubjects = selected ? [] : [subject];
+      } else {
+        if (selected) {
+          appState.selectedSubjects = appState.selectedSubjects.filter(item => item !== subject);
+        } else {
+          if (appState.selectedSubjects.length >= 4) return;
+          appState.selectedSubjects.push(subject);
+        }
+      }
+
+      updateSelectionUI();
+    }
+
+    function updateSelectionUI() {
+      document.querySelectorAll('.subject-btn').forEach(btn => {
+        const subject = btn.dataset.subject;
+        const active = appState.selectedSubjects.includes(subject);
+        btn.className = active
+          ? 'subject-btn text-left px-4 py-4 rounded-2xl border-2 border-emerald-600 bg-emerald-50 transition font-bold'
+          : 'subject-btn text-left px-4 py-4 rounded-2xl border-2 border-slate-200 hover:border-emerald-400 bg-slate-50 hover:bg-emerald-50 transition font-bold';
+        btn.querySelector('span:last-child').textContent = active ? 'Selected' : 'Tap to select';
+      });
+
+      let valid = false;
+      if (!appState.mode) {
+        elements.selectionStatus.textContent = 'No mode selected yet.';
+        elements.selectionHint.textContent = 'Select a mode, then choose your subject(s).';
+      } else if (appState.mode === 'single') {
+        valid = appState.selectedSubjects.length === 1;
+        elements.selectionStatus.textContent = appState.selectedSubjects.length
+          ? `Selected subject: ${appState.selectedSubjects[0]}`
+          : 'Select exactly 1 subject.';
+        elements.selectionHint.textContent = valid
+          ? 'Ready to start your single subject exam.'
+          : 'Single Subject Mode requires exactly 1 subject.';
+      } else {
+        valid = appState.selectedSubjects.length === 4;
+        elements.selectionStatus.textContent = appState.selectedSubjects.length
+          ? `Selected subjects (${appState.selectedSubjects.length}/4): ${appState.selectedSubjects.join(', ')}`
+          : 'Select exactly 4 subjects.';
+        elements.selectionHint.textContent = valid
+          ? 'Ready to start your 4-subject mock exam.'
+          : 'Mock Mode requires exactly 4 subjects.';
+      }
+
+      elements.startSelectedExamBtn.disabled = !valid;
+      elements.startSelectedExamBtn.className = valid
+        ? 'w-full mt-5 px-6 py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-lg transition'
+        : 'w-full mt-5 px-6 py-4 rounded-2xl bg-slate-300 text-white font-extrabold text-lg cursor-not-allowed';
+    }
+
+    function getQuestionsForSubject(subject, count) {
+      const subjectQuestions = QUESTION_BANK.filter(q => q.subject === subject);
+      return shuffle(subjectQuestions).slice(0, count);
+    }
+
+    function startExam() {
+      const questionsPerSubject = 40;
+      const examQuestions = [];
+      const usedIds = new Set();
+
+      appState.selectedSubjects.forEach(subject => {
+        const picked = getQuestionsForSubject(subject, questionsPerSubject);
+        picked.forEach(question => {
+          if (!usedIds.has(question.id)) {
+            usedIds.add(question.id);
+            examQuestions.push(question);
+          }
+        });
+      });
+
+      appState.examQuestions = shuffle(examQuestions);
+      appState.answers = {};
+      appState.currentIndex = 0;
+      appState.submitted = false;
+      appState.timeRemaining = appState.mode === 'single' ? 30 * 60 : 120 * 60;
+
+      elements.examModeLabel.textContent = appState.mode === 'single' ? 'Single Subject Mode' : 'Mock Mode';
+
+      startTimer();
+      renderQuestion();
+      renderQuestionNavigator();
+      updateProgress();
+      showScreen('exam');
+    }
+
+    function startTimer() {
+      clearInterval(appState.timerId);
+      updateTimerDisplay();
+
+      appState.timerId = setInterval(() => {
+        appState.timeRemaining -= 1;
+        updateTimerDisplay();
+        if (appState.timeRemaining <= 0) {
+          clearInterval(appState.timerId);
+          submitExam(true);
+        }
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const minutes = Math.floor(appState.timeRemaining / 60);
+      const seconds = appState.timeRemaining % 60;
+      elements.timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      elements.timerDisplay.className = appState.timeRemaining <= 300
+        ? 'text-2xl sm:text-3xl font-black text-rose-700 animate-pulse'
+        : 'text-2xl sm:text-3xl font-black text-rose-600';
+    }
+
+    function renderQuestion() {
+      const question = appState.examQuestions[appState.currentIndex];
+      if (!question) return;
+
+      elements.questionSubjectBadge.textContent = question.subject;
+      elements.questionNumberBadge.textContent = `Question ${appState.currentIndex + 1}`;
+      elements.questionText.textContent = question.question;
+      elements.optionsContainer.innerHTML = '';
+
+      Object.entries(question.options).forEach(([key, value]) => {
+        const selected = appState.answers[question.id] === key;
+        const label = document.createElement('button');
+        label.type = 'button';
+        label.className = selected
+          ? 'w-full text-left rounded-2xl border-2 border-emerald-600 bg-emerald-50 p-4 transition'
+          : 'w-full text-left rounded-2xl border-2 border-slate-200 bg-white hover:border-emerald-400 hover:bg-emerald-50 p-4 transition';
+        label.innerHTML = `
+          <div class="flex items-start gap-3">
+            <span class="w-9 h-9 shrink-0 rounded-full ${selected ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'} flex items-center justify-center font-extrabold">${key}</span>
+            <span class="font-semibold leading-7">${value}</span>
+          </div>
+        `;
+        label.addEventListener('click', () => selectAnswer(question.id, key));
+        elements.optionsContainer.appendChild(label);
+      });
+
+      elements.prevBtn.disabled = appState.currentIndex === 0;
+      elements.nextBtn.disabled = appState.currentIndex === appState.examQuestions.length - 1;
+      updateProgress();
+      renderQuestionNavigator();
+    }
+
+    function selectAnswer(questionId, optionKey) {
+      appState.answers[questionId] = optionKey;
+      renderQuestion();
+    }
+
+    function updateProgress() {
+      const total = appState.examQuestions.length;
+      const answered = Object.keys(appState.answers).length;
+      const progressPercent = total ? ((appState.currentIndex + 1) / total) * 100 : 0;
+
+      elements.progressBar.style.width = `${progressPercent}%`;
+      elements.progressText.textContent = `Question ${appState.currentIndex + 1} of ${total}`;
+      elements.answeredCount.textContent = `Answered: ${answered}`;
+    }
+
+    function renderQuestionNavigator() {
+      elements.questionNav.innerHTML = '';
+      appState.examQuestions.forEach((question, index) => {
+        const answered = !!appState.answers[question.id];
+        const current = index === appState.currentIndex;
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.textContent = index + 1;
+        btn.className = current
+          ? 'h-11 rounded-xl bg-emerald-600 text-white font-extrabold'
+          : answered
+            ? 'h-11 rounded-xl bg-sky-500 text-white font-extrabold'
+            : 'h-11 rounded-xl bg-slate-200 border border-slate-300 text-slate-800 font-extrabold';
+        btn.addEventListener('click', () => {
+          appState.currentIndex = index;
+          renderQuestion();
+        });
+        elements.questionNav.appendChild(btn);
+      });
+    }
+
+    function submitExam(autoSubmitted = false) {
+      if (appState.submitted) return;
+
+      if (!autoSubmitted) {
+        const proceed = window.confirm('Are you sure you want to submit your exam now?');
+        if (!proceed) return;
+      }
+
+      appState.submitted = true;
+      clearInterval(appState.timerId);
+
+      const total = appState.examQuestions.length;
+      let score = 0;
+      const breakdownMap = {};
+
+      appState.examQuestions.forEach(question => {
+        if (!breakdownMap[question.subject]) {
+          breakdownMap[question.subject] = { total: 0, score: 0 };
+        }
+        breakdownMap[question.subject].total += 1;
+
+        if (appState.answers[question.id] === question.correctAnswer) {
+          score += 1;
+          breakdownMap[question.subject].score += 1;
+        }
+      });
+
+      const percentage = total ? Math.round((score / total) * 100) : 0;
+      const passed = percentage >= 50;
+
+      elements.resultScore.textContent = score;
+      elements.resultTotal.textContent = total;
+      elements.resultPercentage.textContent = `${percentage}%`;
+      elements.resultMessage.textContent = passed ? 'Pass ✅' : 'Fail ❌';
+      elements.resultSubtext.textContent = autoSubmitted
+        ? 'Time ran out, so your exam was submitted automatically.'
+        : passed
+          ? 'Good job. Keep practicing to improve even more.'
+          : 'Keep practicing and try again for a better score.';
+
+      elements.resultMessageBox.className = passed
+        ? 'rounded-2xl border p-5 text-center bg-emerald-50 border-emerald-200 text-emerald-800'
+        : 'rounded-2xl border p-5 text-center bg-rose-50 border-rose-200 text-rose-800';
+
+      elements.subjectBreakdown.innerHTML = '';
+      Object.entries(breakdownMap).forEach(([subject, data]) => {
+        const percent = Math.round((data.score / data.total) * 100);
+        const card = document.createElement('div');
+        card.className = 'rounded-2xl bg-white border border-slate-200 p-4';
+        card.innerHTML = `
+          <div class="flex items-center justify-between gap-3 mb-2">
+            <h4 class="font-extrabold">${subject}</h4>
+            <span class="text-sm font-bold ${percent >= 50 ? 'text-emerald-700' : 'text-rose-700'}">${percent}%</span>
+          </div>
+          <p class="text-sm text-slate-600">${data.score} / ${data.total} correct</p>
+        `;
+        elements.subjectBreakdown.appendChild(card);
+      });
+
+      showScreen('result');
+    }
+
+    function resetExamState() {
+      clearInterval(appState.timerId);
+      appState.examQuestions = [];
+      appState.answers = {};
+      appState.currentIndex = 0;
+      appState.timeRemaining = 0;
+      appState.submitted = false;
+    }
+
+    function resetAll() {
+      resetExamState();
+      appState.mode = null;
+      appState.selectedSubjects = [];
+      document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.className = 'mode-btn rounded-2xl border-2 border-slate-200 px-4 py-4 text-left transition';
+      });
+      elements.modeRules.textContent = 'Choose a mode to view its rules.';
+      updateSelectionUI();
+      renderSubjectGroups();
+    }
+
+    document.getElementById('start-home-btn').addEventListener('click', () => showScreen('selection'));
+    document.getElementById('back-home-btn').addEventListener('click', () => showScreen('home'));
+    document.getElementById('start-selected-exam-btn').addEventListener('click', startExam);
+    document.getElementById('prev-btn').addEventListener('click', () => {
+      if (appState.currentIndex > 0) {
+        appState.currentIndex -= 1;
+        renderQuestion();
+      }
+    });
+    document.getElementById('next-btn').addEventListener('click', () => {
+      if (appState.currentIndex < appState.examQuestions.length - 1) {
+        appState.currentIndex += 1;
+        renderQuestion();
+      }
+    });
+    document.getElementById('submit-exam-btn').addEventListener('click', () => submitExam(false));
+    document.getElementById('retake-btn').addEventListener('click', () => {
+      resetExamState();
+      showScreen('selection');
+    });
+    document.getElementById('go-home-result-btn').addEventListener('click', () => {
+      resetAll();
+      showScreen('home');
+    });
+
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+      btn.addEventListener('click', () => setMode(btn.dataset.mode));
+    });
+
+    renderSubjectGroups();
+    updateSelectionUI();
+  </script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79","server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
+</body>
+</html>
